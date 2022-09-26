@@ -4,6 +4,8 @@ let stop = document.getElementById('stop');
 let reset = document.getElementById('reset');
 let time = document.getElementById('time');
 
+console.log('Stopwatch loaded');
+
 function startTime() {
     if (running === 0) {
         running = 1;
@@ -46,7 +48,6 @@ function getTime() {
 
 start.onclick = function() {
     if (running === 0) {
-        startTime = new Date();
         startTime();
     } else {
         stopTime();
