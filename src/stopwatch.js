@@ -1,63 +1,58 @@
-let running = 0;
-let start = document.getElementById('start');
-let stop = document.getElementById('stop');
-let reset = document.getElementById('reset');
-let time = document.getElementById('time');
+let [minutes, seconds, milliseconds] = [0, 0, 0];
+let timer = null;
+let isRunning = false;
 
-console.log('Stopwatch loaded');
+const startButton = document.getElementById('start');
+const stopButton = document.getElementById('stop');
+const resetButton = document.getElementById('reset');
+const time = document.getElementById('time');
 
-function startTime() {
-    if (running === 0) {
-        running = 1;
-        increment();
-        start.innerHTML = 'Pause';
-    } else {
-        running = 0;
-        start.innerHTML = 'Resume';
+const start = () => {
+  if (!isRunning) {
+    isRunning = true;
+    timer = setInterval(run, 10);
+  }
+}
+
+const stop = () => {
+    if (isRunning) {
+        isRunning = false;
+        clearInterval(timer);
     }
 }
 
-function stopTime() {
-    running = 0;
-    start.innerHTML = 'Start';
-}
-
-function resetTime() {
-    running = 0;
-    time.innerHTML = '00:00:00';
-    start.innerHTML = 'Start';
-}
-
-function increment() {
-    if (running === 1) {
-        setTimeout(function() {
-            time.innerHTML = getTime();
-            increment();
-        }, 1000);
+const reset = () => {
+    if (!isRunning) {
+        [minutes, seconds, milliseconds] = [0, 0, 0];
+        time.innerHTML = '00:00:00';
     }
 }
 
-function getTime() {
-    let currentTime = new Date();
-    let timeElapsed = new Date(currentTime - startTime);
-    let min = timeElapsed.getMinutes();
-    let sec = timeElapsed.getSeconds();
-    let ms = timeElapsed.getMilliseconds();
-    return (min < 10 ? '0' + min : min) + ':' + (sec < 10 ? '0' + sec : sec) + ':' + (ms < 10 ? '00' + ms : ms < 100 ? '0' + ms : ms);
+const run = () => {
+    milliseconds += 10;
+    if (milliseconds === 1000) {
+        milliseconds = 0;
+        seconds++;
+        if (seconds === 60) {
+            seconds = 0;
+            minutes++;
+        }
+    }
+    time.innerHTML = getFormattedTime();
 }
 
-start.onclick = function() {
-    if (running === 0) {
-        startTime();
-    } else {
-        stopTime();
+const getFormattedTime = () => {
+    return `${pad0(minutes)}:${pad0(seconds)}:${pad0(Math.floor(milliseconds / 10))}`;
+}
+
+const pad0 = (value) => {
+    let result = value.toString();
+    if (result.length < 2) {
+        result = '0' + result;
     }
-};
+    return result;
+}
 
-stop.onclick = function() {
-    stopTime();
-};
-
-reset.onclick = function() {
-    resetTime();
-};
+startButton.addEventListener('click', start);
+stopButton.addEventListener('click', stop);
+resetButton.addEventListener('click', reset);
